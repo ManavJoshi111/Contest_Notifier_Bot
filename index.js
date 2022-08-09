@@ -18,7 +18,7 @@ const dateToTime = date => date.toLocaleString('en-US', {
 
 const dotenv = require('dotenv');
 dotenv.config();
-// var http = require('http'); http.createServer(function(req, res) { res.write("Bot is running now"); res.end(); }).listen(8080);
+var http = require('http'); http.createServer(function(req, res) { res.write("Bot is running now"); res.end(); }).listen(8080);
 
 const getContest = async () => {
   const data = await fetch("https://kontests.net/api/v1/all");

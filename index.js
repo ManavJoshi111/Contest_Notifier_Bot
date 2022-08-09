@@ -41,9 +41,9 @@ const sendReminder = async () => {
 client.on("ready", () => {
   console.log("I'm ready and logged in as ", client.user.tag);
   
-  // setInterval(() => {
+  setInterval(() => {
     sendReminder();
-  // }, 1000 * 60 * 60 * 2);
+  }, 1000 * 60 * 60 * 2);
 })
 
 client.on("messageCreate", async msg => {

@@ -1,0 +1,1 @@
+var message =`New Contest Details : \nContest Name : ${contests[contest].name}\nPlatform : ${contests[contest].site}\n Date : \nTime ${contests[contest].start_time}:\nLink : ${contests[contest].url}`;

@@ -48,9 +48,6 @@ client.on("ready", () => {
 
 client.on("messageCreate", async msg => {
   if (msg.author.bot) return;
-  if (msg.content === "ping") {
-    msg.reply("pong");
-  }
   if (msg.content === "contest") {
     const contests = await getContest();
     for (var contest in contests) {

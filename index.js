@@ -31,7 +31,7 @@ const sendReminder = async () => {
   for (var contest in contests) {
     if (contests[contest].in_24_hours == "Yes") {
       let dateString = contests[contest].start_time;
-      let localDate = new Date(dateString);
+      let localDate = new Date(dateString).toLocaleString(undefined,{timeZone:'Asia/Kolkata'});
       var message = `New Contest Details : \nContest Name : ${contests[contest].name}\nPlatform : ${contests[contest].site}\nDate : ${localDate.getDate()} ${localDate.getMonth()} ${localDate.getFullYear()}\nTime : ${dateToTime(localDate)}\nLink : ${contests[contest].url}`;
 
       client.channels.cache.find(channel => channel.name === 'general').send(message);

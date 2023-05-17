@@ -1,4 +1,3 @@
-const Discord = require('discord.js');
 const fetch = require('node-fetch');
 const { Client, GatewayIntentBits } = require('discord.js');
 const client = new Client({
@@ -18,7 +17,7 @@ const dateToTime = date => date.toLocaleString('en-US', {
 
 const dotenv = require('dotenv');
 dotenv.config();
-var http = require('http'); http.createServer(function (req, res) { res.write("Bot is running now"); res.end(); }).listen(8080);
+var http = require('http'); http.createServer(function(req, res) { res.write("Bot is running now"); res.end(); }).listen(8080);
 
 const getContest = async () => {
   const data = await fetch("https://kontests.net/api/v1/all");
@@ -31,8 +30,13 @@ const sendReminder = async () => {
   for (var contest in contests) {
     if (contests[contest].in_24_hours == "Yes") {
       let dateString = contests[contest].start_time;
-      let localDate = new Date(dateString).toLocaleString(undefined,{timeZone:'Asia/Kolkata'});
-      var message = `New Contest Details : \nContest Name : ${contests[contest].name}\nPlatform : ${contests[contest].site}\nDate : ${localDate.getDate()} ${localDate.getMonth()} ${localDate.getFullYear()}\nTime : ${dateToTime(localDate)}\nLink : ${contests[contest].url}`;
+      let localDate = new Date(dateString).toLocaleString(undefined, { timeZone: 'Asia/Kolkata' });
+      let timeString = localDate.split(' ')[1];
+      let localDateString = localDate.split(' ')[0];
+      console.log(timeString);
+      console.log(localDateString);
+      // ${localDate.getMonth()} ${localDate.getFullYear()
+      var message = `New Contest Details : \nContest Name : ${contests[contest].name}\nPlatform : ${contests[contest].site}\nDate : ${localDateString}\nTime : ${timeString}\nLink : ${contests[contest].url}`;
 
       client.channels.cache.find(channel => channel.name === 'general').send(message);
     }
@@ -40,29 +44,33 @@ const sendReminder = async () => {
 }
 client.on("ready", () => {
   console.log("I'm ready and logged in as ", client.user.tag);
-
+  // console.log("TOken is ; ", process.env['TOKEN']);
   setInterval(() => {
     sendReminder();
   }, 1000 * 60 * 60 * 2);
 })
 
-client.on("messageCreate", async msg => {
-  if (msg.author.bot) return;
-  if (msg.content === "contest") {
-    const contests = await getContest();
-    for (var contest in contests) {
-      if (contests[contest].in_24_hours == "Yes") {
-        let dateString = contests[contest].start_time;
-        let localDate = new Date(dateString);
-        let utcDate = localDate.getTime() + userOffset;
+// client.on("messageCreate",async msg=>{
+//   if(msg.content=='ping')
+//   {
+//     msg.channel.send("Pong");
+//   }
+// })
+// client.on("messageCreate", async msg => {
+//   if (msg.author.bot) return;
+//   if (msg.content === "contest") {
+//     const contests = await getContest();
+//     for (var contest in contests) {
+//       if (contests[contest].in_24_hours == "Yes") {
+//         let dateString = contests[contest].start_time;
+//         let localDate = new Date(dateString);
+//         let utcDate = localDate.getTime() + userOffset;
 
-        console.log("In 24 hours : ", contests[contest]);
-        var message = `${contests[contest].site} , is having contest named : ,${contests[contest].name}, at : ,${contests[contest].start_time}`;
-        msg.channel.send(message);
-      }
-    }
-
-  }
-})
-
+//         console.log("In 24 hours : ", contests[contest]);
+//         var message = `${contests[contest].site} , is having contest named : ,${contests[contest].name}, at : ,${contests[contest].start_time}`;
+//         msg.channel.send(message);
+//       }
+//     }
+//   }
+// })
 client.login(process.env['TOKEN']);

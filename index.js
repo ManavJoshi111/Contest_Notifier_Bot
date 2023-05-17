@@ -56,7 +56,7 @@ client.on("ready", () => {
   setInterval(() => {
     console.log("in interval");
     sendReminder();
-  }, 1000 * 60 * 12);
+  }, 1000);
 })
 
 client.login(process.env['TOKEN']);

@@ -1,7 +1,8 @@
 const fetch = require('node-fetch');
 const { Client, GatewayIntentBits } = require('discord.js');
+const CronJob = require('cron').CronJob;
 const client = new Client({
-  'intents': [
+  intents: [
     GatewayIntentBits.DirectMessages,
     GatewayIntentBits.Guilds,
     GatewayIntentBits.GuildBans,
@@ -11,52 +12,65 @@ const client = new Client({
 });
 
 const userOffset = new Date().getTimezoneOffset() * 60 * 1000;
-const dateToTime = date => date.toLocaleString('en-US', {
-  hour: 'numeric',
-  minute: 'numeric'
-});
+const dateToTime = (date) =>
+  date.toLocaleString('en-US', { hour: 'numeric', minute: 'numeric' });
 
 const dotenv = require('dotenv');
 dotenv.config();
 
-var http = require('http');
-http.createServer(function(req, res) {
-  res.write("Bot is running now");
-  res.end();
-}).listen(8080);
+const http = require('http');
+http
+  .createServer(function(req, res) {
+    res.write('Bot is running now');
+    res.end();
+  })
+  .listen(8080);
 
 const getContest = async () => {
-  const data = await fetch("https://kontests.net/api/v1/all");
+  const data = await fetch('https://kontests.net/api/v1/all');
   const dataJson = await data.json();
   return dataJson;
-}
+};
 
 const sendReminder = async () => {
-  console.log("In send reminder");
+  console.log('In send reminder');
   const contests = await getContest();
-  for (var contest in contests) {
-    if (contests[contest].in_24_hours == "Yes") {
-      let dateString = contests[contest].start_time;
-      let localDate = new Date(dateString).toLocaleString(undefined, { timeZone: 'Asia/Kolkata' });
-      let timeString = localDate.split(' ')[1];
-      let localDateString = localDate.split(' ')[0];
-      console.log(timeString);
-      console.log(localDateString);
-      // ${localDate.getMonth()} ${localDate.getFullYear()}
-      var message = `New Contest Details : \nContest Name : ${contests[contest].name}\nPlatform : ${contests[contest].site}\nDate : ${localDateString}\nTime : ${timeString}\nLink : ${contests[contest].url}`;
 
-      client.channels.cache.find(channel => channel.name === 'general').send(message);
+  for (const contest of contests) {
+    if (contest.in_24_hours === 'Yes') {
+      const localDate = new Date(contest.start_time).toLocaleString('en-US', {
+        timeZone: 'Asia/Kolkata',
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+      });
+      const localTime = new Date(contest.start_time).toLocaleString('en-US', {
+        timeZone: 'Asia/Kolkata',
+        hour: 'numeric',
+        minute: 'numeric',
+        hour12: true,
+      });
+
+      const message = `New Contest Details:\nContest Name: ${contest.name}\nPlatform: ${contest.site}\nDate: ${localDate}\nTime: ${localTime}\nLink: ${contest.url}`;
+
+      client.channels.cache
+        .find((channel) => channel.name === 'general')
+        .send(message);
     }
   }
-}
+};
 
-client.on("ready", () => {
+
+
+client.on('ready', () => {
   console.log("I'm ready and logged in as ", client.user.tag);
 
-  setInterval(() => {
-    console.log("in interval");
+  const job = new CronJob('0 0 * * * *', () => {
+    console.log('in interval');
     sendReminder();
-  }, 1000);
-})
+  });
+
+  job.start();
+});
 
 client.login(process.env['TOKEN']);
